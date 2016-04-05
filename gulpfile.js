@@ -44,7 +44,6 @@ gulp.task('watch', function(){
         console.log('');
         console.log('-- JS Change Detected --');
         gulp.start('build-js');
-        gulp.start('build-test');
     });
 
     watch(lessDir + "/**/*.{less}", function() {

@@ -19,11 +19,11 @@ body {
 }
 .board .board-row .board-cell {
   display: inline-block;
-  background: green;
+  background: url(../img/board-cell-empty.jpg) top left no-repeat;
+  background-size: 100% 100%;
   width: 50px;
   height: 50px;
-  margin: 0;
 }
 .board .board-row .board-cell.has-mole {
-  background: brown;
+  background-image: url(../img/board-cell-filled.jpg);
 }
