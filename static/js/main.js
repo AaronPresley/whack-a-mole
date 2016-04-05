@@ -1,4 +1,8 @@
 (function e(t,n,r){function s(o,u){if(!n[o]){if(!t[o]){var a=typeof require=="function"&&require;if(!u&&a)return a(o,!0);if(i)return i(o,!0);throw new Error("Cannot find module '"+o+"'")}var f=n[o]={exports:{}};t[o][0].call(f.exports,function(e){var n=t[o][1][e];return s(n?n:e)},f,f.exports,e,t,n,r)}return n[o].exports}var i=typeof require=="function"&&require;for(var o=0;o<r.length;o++)s(r[o]);return s})({1:[function(require,module,exports){
+var GameOutput = require('./gameOutput');
+new GameOutput('#gameContainer');
+
+},{"./gameOutput":2}],2:[function(require,module,exports){
 $ = require('jquery');
 
 var GameOutput = function(gameContainer){
@@ -8,7 +12,7 @@ var GameOutput = function(gameContainer){
 };
 
 GameOutput.prototype.displayBoard = function(){
-    var boardHtml = this.generateBoardHtml(5, 5);
+    var boardHtml = this.generateBoardHtml(8, 8);
     this.boardContainer.html(boardHtml);
 };
 
@@ -54,16 +58,24 @@ GameOutput.prototype.generateCellHtml = function(rowNum, totalCells) {
     return cellHtml;
 };
 
+GameOutput.prototype.setCellHasMole = function(theCell, hasMole) {
+    if( hasMole )
+        theCell.addClass('has-mole');
+    else
+        theCell.removeClass('has-mole');
+};
+
 GameOutput.prototype.initListeners = function(){
+    var self = this;
+
     this.boardContainer.find('.board-cell').click(function(e){
-        console.log( $(this).data('xPos') );
-        console.log( $(this).data('yPos') );
+        self.setCellHasMole($(this), !$(this).hasClass('has-mole'));
     });
 };
 
-new GameOutput('#gameContainer');
+module.exports = GameOutput;
 
-},{"jquery":2}],2:[function(require,module,exports){
+},{"jquery":3}],3:[function(require,module,exports){
 /*!
  * jQuery JavaScript Library v2.2.2
  * http://jquery.com/
