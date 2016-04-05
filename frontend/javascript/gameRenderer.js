@@ -3,6 +3,8 @@ $ = require('jquery');
 var GameRenderer = function(theGame, gameContainer){
     this.boardContainer = $(gameContainer);
     this.startGameBtn = $('a.start-game');
+    this.userScoreOutput = $('.user-score');
+    this.userScoreOutput.html(0);
 
     this.game = theGame;
 
@@ -26,7 +28,7 @@ GameRenderer.prototype.setCellHasMole = function(theCell, hasMole) {
 };
 
 GameRenderer.prototype.updateUserScore = function(score){
-    console.log("User Score: " + score)
+    this.userScoreOutput.html(score);
 };
 
 GameRenderer.prototype.setMoles = function(moles){
@@ -98,7 +100,20 @@ GameRenderer.prototype.__initListeners = function(){
     var self = this;
 
     this.boardContainer.find('.board-cell').click(function(e){
-        // self.setCellHasMole($(this), !$(this).hasClass('has-mole'));
+        var thisX = $(this).data('xPos');
+        var thisY = $(this).data('yPos');
+        self.game.locationChosen(thisX, thisY, function(mole){
+            self.game.pause();
+            self.game.increaseUserScore();
+            $(this).removeClass('has-mole').addClass('mole-hit');
+            setTimeout(function(){
+                $(this).removeClass('mole-hit');
+                self.game.start();
+
+            }.bind(this), 1000);
+        }.bind(this), function(){
+            console.log('BOO!');
+        }.bind(this));
     });
 
     this.startGameBtn.click(function(e){

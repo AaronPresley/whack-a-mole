@@ -4,7 +4,7 @@
 var Game = require('./whackAMole/game');
 var GameRenderer = require('./gameRenderer');
 
-var thisGame = new Game([8,8], 4);
+var thisGame = new Game([4, 4], 8);
 new GameRenderer(thisGame, "#gameContainer");
 
 },{"./gameRenderer":2,"./whackAMole/game":4}],2:[function(require,module,exports){
@@ -13,6 +13,8 @@ $ = require('jquery');
 var GameRenderer = function(theGame, gameContainer){
     this.boardContainer = $(gameContainer);
     this.startGameBtn = $('a.start-game');
+    this.userScoreOutput = $('.user-score');
+    this.userScoreOutput.html(0);
 
     this.game = theGame;
 
@@ -36,7 +38,7 @@ GameRenderer.prototype.setCellHasMole = function(theCell, hasMole) {
 };
 
 GameRenderer.prototype.updateUserScore = function(score){
-    console.log("User Score: " + score)
+    this.userScoreOutput.html(score);
 };
 
 GameRenderer.prototype.setMoles = function(moles){
@@ -108,7 +110,20 @@ GameRenderer.prototype.__initListeners = function(){
     var self = this;
 
     this.boardContainer.find('.board-cell').click(function(e){
-        // self.setCellHasMole($(this), !$(this).hasClass('has-mole'));
+        var thisX = $(this).data('xPos');
+        var thisY = $(this).data('yPos');
+        self.game.locationChosen(thisX, thisY, function(mole){
+            self.game.pause();
+            self.game.increaseUserScore();
+            $(this).removeClass('has-mole').addClass('mole-hit');
+            setTimeout(function(){
+                $(this).removeClass('mole-hit');
+                self.game.start();
+
+            }.bind(this), 1000);
+        }.bind(this), function(){
+            console.log('BOO!');
+        }.bind(this));
     });
 
     this.startGameBtn.click(function(e){
@@ -254,8 +269,17 @@ var Game = function(boardSize, totalMoles){
 };
 
 Game.prototype.increaseUserScore = function(){
-    this.__userScore++
+    this.userScore++
     this.onUserScoreChanged(this.userScore);
+};
+
+Game.prototype.locationChosen = function(x, y, onSuccess, onFailure){
+    var theMole = this.board.moleAtLocation(x, y);
+    if( theMole ){
+        onSuccess(theMole);
+    } else {
+        onFailure();
+    }
 };
 
 Game.prototype.start = function(){
@@ -263,15 +287,25 @@ Game.prototype.start = function(){
     var moveMoles = function(){
         this.board.moveAllMolesRandomly();
         this.onMolesMoved(this.board.moles);
-        this.__gameLoop = setTimeout(moveMoles, 1500);
+        this.__gameLoop = setTimeout(moveMoles, 750);
     }.bind(this);
     moveMoles();
 };
 
+Game.prototype.pause = function(){
+    this.gameInProgress = false;
+    clearTimeout(this.__gameLoop);
+    this.__gameLoop = null;
+};
+
 Game.prototype.stop = function(){
     this.gameInProgress = false;
+    this.userScore = 0;
     this.board.clearMoles();
+
     this.onMolesMoved(this.board.moles);
+    this.onUserScoreChanged(this.userScore);
+    
     clearTimeout(this.__gameLoop);
 };
 

@@ -3,5 +3,5 @@
 var Game = require('./whackAMole/game');
 var GameRenderer = require('./gameRenderer');
 
-var thisGame = new Game([8,8], 4);
+var thisGame = new Game([4, 4], 8);
 new GameRenderer(thisGame, "#gameContainer");

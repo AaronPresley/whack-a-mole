@@ -46,3 +46,6 @@ header h2 {
 .board .board-row .board-cell.has-mole {
   background-image: url(../img/board-cell-filled.jpg);
 }
+.board .board-row .board-cell.mole-hit {
+  background-image: url(../img/board-cell-hit.jpg);
+}

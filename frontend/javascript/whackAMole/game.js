@@ -23,8 +23,17 @@ var Game = function(boardSize, totalMoles){
 };
 
 Game.prototype.increaseUserScore = function(){
-    this.__userScore++
+    this.userScore++
     this.onUserScoreChanged(this.userScore);
+};
+
+Game.prototype.locationChosen = function(x, y, onSuccess, onFailure){
+    var theMole = this.board.moleAtLocation(x, y);
+    if( theMole ){
+        onSuccess(theMole);
+    } else {
+        onFailure();
+    }
 };
 
 Game.prototype.start = function(){
@@ -32,15 +41,25 @@ Game.prototype.start = function(){
     var moveMoles = function(){
         this.board.moveAllMolesRandomly();
         this.onMolesMoved(this.board.moles);
-        this.__gameLoop = setTimeout(moveMoles, 1500);
+        this.__gameLoop = setTimeout(moveMoles, 750);
     }.bind(this);
     moveMoles();
 };
 
+Game.prototype.pause = function(){
+    this.gameInProgress = false;
+    clearTimeout(this.__gameLoop);
+    this.__gameLoop = null;
+};
+
 Game.prototype.stop = function(){
     this.gameInProgress = false;
+    this.userScore = 0;
     this.board.clearMoles();
+
     this.onMolesMoved(this.board.moles);
+    this.onUserScoreChanged(this.userScore);
+    
     clearTimeout(this.__gameLoop);
 };
 
