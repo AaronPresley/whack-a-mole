@@ -3,8 +3,17 @@
 var Mole = require('./mole');
 
 var Board = function(xLength, yLength, totalMoles){
+    // Assigning these to a main property so it's easy to read their
+    // x and y length without counting the grid arrays
+    this.gridX = xLength;
+    this.gridY = yLength;
+
+    // The array of arrays that hold our grid
     this.grid = this.__generateGrid(xLength, yLength);
+
+    // The array that hold our moles
     this.moles = this.__generateMoles(totalMoles);
+    this.moveAllMolesRandomly();
 };
 
 Board.prototype.__randomInRange = function(min, max){
@@ -35,7 +44,6 @@ Board.prototype.__generateMoles = function(totalMoles) {
     var theMoles = [];
     for(var x = 0; x < totalMoles; x++ ){
         var thisMole = new Mole();
-        this.moveMoleRandomly(thisMole);
         theMoles.push(thisMole);
     }
 
@@ -48,11 +56,16 @@ Board.prototype.moveMoleToLocation = function(mole, x, y) {
 };
 
 Board.prototype.moveMoleRandomly = function(mole){
-    var xMax = this.grid[0].length;
-    var yMax = this.grid.length;
+    var xMax = this.grid[0].length-1;
+    var yMax = this.grid.length-1;
 
     var xRandom = this.__randomInRange(0, xMax);
     var yRandom = this.__randomInRange(0, yMax);
+
+    while( this.moleAtLocation(xRandom, yRandom) != null ){
+        var xRandom = this.__randomInRange(0, xMax);
+        var yRandom = this.__randomInRange(0, yMax);
+    }
 
     mole.moveTo(xRandom, yRandom);
 
@@ -67,7 +80,15 @@ Board.prototype.moveAllMolesRandomly = function(){
     return this;
 };
 
+Board.prototype.clearMoles = function(){
+    for( var x = 0; x < this.moles.length; x++ ){
+        this.moles[x].x = null;
+        this.moles[x].y = null;
+    }
+}
+
 Board.prototype.moleAtLocation = function(xPos, yPos){
+
     for( var x = 0; x < this.moles.length; x++ ){
         var thisMole = this.moles[x];
         if( thisMole.x == xPos && thisMole.y == yPos )

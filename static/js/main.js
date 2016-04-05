@@ -1,22 +1,64 @@
 (function e(t,n,r){function s(o,u){if(!n[o]){if(!t[o]){var a=typeof require=="function"&&require;if(!u&&a)return a(o,!0);if(i)return i(o,!0);throw new Error("Cannot find module '"+o+"'")}var f=n[o]={exports:{}};t[o][0].call(f.exports,function(e){var n=t[o][1][e];return s(n?n:e)},f,f.exports,e,t,n,r)}return n[o].exports}var i=typeof require=="function"&&require;for(var o=0;o<r.length;o++)s(r[o]);return s})({1:[function(require,module,exports){
-var GameOutput = require('./gameOutput');
-new GameOutput('#gameContainer');
+"use strict";
 
-},{"./gameOutput":2}],2:[function(require,module,exports){
+var Game = require('./whackAMole/game');
+var GameRenderer = require('./gameRenderer');
+
+var thisGame = new Game([8,8], 4);
+new GameRenderer(thisGame, "#gameContainer");
+
+},{"./gameRenderer":2,"./whackAMole/game":4}],2:[function(require,module,exports){
 $ = require('jquery');
 
-var GameOutput = function(gameContainer){
+var GameRenderer = function(theGame, gameContainer){
     this.boardContainer = $(gameContainer);
-    this.displayBoard();
-    this.initListeners();
+    this.startGameBtn = $('a.start-game');
+
+    this.game = theGame;
+
+    this.game.onMolesMoved = function(moles){
+        this.setMoles(moles);
+    }.bind(this);
+
+    this.game.onUserScoreChanged = function(score){
+        this.updateUserScore(score);
+    }.bind(this);
+
+    this.__displayBoard();
+    this.__initListeners();
 };
 
-GameOutput.prototype.displayBoard = function(){
-    var boardHtml = this.generateBoardHtml(8, 8);
+GameRenderer.prototype.setCellHasMole = function(theCell, hasMole) {
+    if( hasMole )
+        theCell.addClass('has-mole');
+    else
+        theCell.removeClass('has-mole');
+};
+
+GameRenderer.prototype.updateUserScore = function(score){
+    console.log("User Score: " + score)
+};
+
+GameRenderer.prototype.setMoles = function(moles){
+
+    // Removing all current moles
+    this.boardContainer.find('.board-cell.has-mole').removeClass('has-mole');
+
+    for( var x = 0; x < moles.length; x++ ){
+        var thisMole = moles[x];
+        var thisCell = this.cellAtLocation(thisMole.x, thisMole.y);
+        thisCell.addClass('has-mole');
+    }
+};
+
+GameRenderer.prototype.__displayBoard = function(){
+    var xLen = this.game.board.gridX;
+    var yLen = this.game.board.gridY;
+    var boardHtml = this.__generateBoardHtml(xLen, yLen);
     this.boardContainer.html(boardHtml);
 };
 
-GameOutput.prototype.generateBoardHtml = function(xLen, yLen){
+GameRenderer.prototype.__generateBoardHtml = function(xLen, yLen){
     var boardHtml = '<div class="board">';
 
     for( var y = 0; y < yLen; y++ ){
@@ -26,23 +68,23 @@ GameOutput.prototype.generateBoardHtml = function(xLen, yLen){
         else if( y == yLen-1)
             classString = 'last';
 
-        boardHtml += this.generateRowHtml(y, xLen, classString);
+        boardHtml += this.__generateRowHtml(y, xLen, classString);
     }
 
     boardHtml += '</div>';
     return boardHtml;
 };
 
-GameOutput.prototype.generateRowHtml = function(rowNum, totalCells, classString){
+GameRenderer.prototype.__generateRowHtml = function(rowNum, totalCells, classString){
     classString = classString == undefined ? '' : classString;
 
     var rowOutput = '<div class="board-row ' + classString + '">';
-    rowOutput += this.generateCellHtml(rowNum, totalCells);
+    rowOutput += this.__generateCellHtml(rowNum, totalCells);
     rowOutput += '</div>';
     return rowOutput;
 };
 
-GameOutput.prototype.generateCellHtml = function(rowNum, totalCells) {
+GameRenderer.prototype.__generateCellHtml = function(rowNum, totalCells) {
     var cellHtml = "";
     for( var x = 0; x < totalCells; x++ ){
         var thisCellClassString = '';
@@ -58,24 +100,205 @@ GameOutput.prototype.generateCellHtml = function(rowNum, totalCells) {
     return cellHtml;
 };
 
-GameOutput.prototype.setCellHasMole = function(theCell, hasMole) {
-    if( hasMole )
-        theCell.addClass('has-mole');
-    else
-        theCell.removeClass('has-mole');
+GameRenderer.prototype.cellAtLocation = function(x, y){
+    return this.boardContainer.find('.board-cell[data-x-pos="'+x+'"][data-y-pos="'+y+'"]');
 };
 
-GameOutput.prototype.initListeners = function(){
+GameRenderer.prototype.__initListeners = function(){
     var self = this;
 
     this.boardContainer.find('.board-cell').click(function(e){
-        self.setCellHasMole($(this), !$(this).hasClass('has-mole'));
+        // self.setCellHasMole($(this), !$(this).hasClass('has-mole'));
+    });
+
+    this.startGameBtn.click(function(e){
+        e.preventDefault();
+        if( !self.game.gameInProgress ) {
+            $(this).html('Stop Game');
+            self.game.start();
+        } else {
+            $(this).html('Start Game');
+            self.game.stop();
+        }
     });
 };
 
-module.exports = GameOutput;
+module.exports = GameRenderer;
 
-},{"jquery":3}],3:[function(require,module,exports){
+},{"jquery":6}],3:[function(require,module,exports){
+"use strict";
+
+var Mole = require('./mole');
+
+var Board = function(xLength, yLength, totalMoles){
+    // Assigning these to a main property so it's easy to read their
+    // x and y length without counting the grid arrays
+    this.gridX = xLength;
+    this.gridY = yLength;
+
+    // The array of arrays that hold our grid
+    this.grid = this.__generateGrid(xLength, yLength);
+
+    // The array that hold our moles
+    this.moles = this.__generateMoles(totalMoles);
+    this.moveAllMolesRandomly();
+};
+
+Board.prototype.__randomInRange = function(min, max){
+    return Math.floor(Math.random() * (max - min + 1)) + min;
+};
+
+Board.prototype.__generateGrid = function(xLength, yLength){
+    var thisGrid = [];
+
+    for( var y = 0; y < yLength; y++ ){
+        var thisRow = [];
+        for( var x = 0; x < xLength; x++ ){
+            thisRow.push(x);
+        }
+        thisGrid.push(thisRow);
+    }
+
+    return thisGrid;
+};
+
+Board.prototype.__generateMoles = function(totalMoles) {
+    // First we need to make sure there aren't more moles than
+    // blocks in the grid minus 1
+    var totalBlocks = this.grid[0].length * this.grid[1].length
+    if( totalMoles > totalBlocks - 1 )
+        throw "With this grid, your max moles are " + totalMoles;
+
+    var theMoles = [];
+    for(var x = 0; x < totalMoles; x++ ){
+        var thisMole = new Mole();
+        theMoles.push(thisMole);
+    }
+
+    return theMoles;
+};
+
+Board.prototype.moveMoleToLocation = function(mole, x, y) {
+    mole.moveTo(x, y);
+    return this;
+};
+
+Board.prototype.moveMoleRandomly = function(mole){
+    var xMax = this.grid[0].length-1;
+    var yMax = this.grid.length-1;
+
+    var xRandom = this.__randomInRange(0, xMax);
+    var yRandom = this.__randomInRange(0, yMax);
+
+    while( this.moleAtLocation(xRandom, yRandom) != null ){
+        var xRandom = this.__randomInRange(0, xMax);
+        var yRandom = this.__randomInRange(0, yMax);
+    }
+
+    mole.moveTo(xRandom, yRandom);
+
+    return this;
+};
+
+Board.prototype.moveAllMolesRandomly = function(){
+    for( var x in this.moles ){
+        this.moveMoleRandomly(this.moles[x]);
+    }
+
+    return this;
+};
+
+Board.prototype.clearMoles = function(){
+    for( var x = 0; x < this.moles.length; x++ ){
+        this.moles[x].x = null;
+        this.moles[x].y = null;
+    }
+}
+
+Board.prototype.moleAtLocation = function(xPos, yPos){
+
+    for( var x = 0; x < this.moles.length; x++ ){
+        var thisMole = this.moles[x];
+        if( thisMole.x == xPos && thisMole.y == yPos )
+            return thisMole;
+    }
+
+    return null;
+};
+
+module.exports = Board;
+
+},{"./mole":5}],4:[function(require,module,exports){
+"use strict";
+
+var Board = require('./board');
+
+var Game = function(boardSize, totalMoles){
+    // Holds the the current status of our game board
+    this.board = new Board(boardSize[0], boardSize[1], totalMoles);
+
+    // A variable to check whether or not there's a going going
+    this.gameInProgress = false;
+
+    // A function that gets run every time a user's score changes
+    this.onUserScoreChanged = function(score){};
+
+    // A function that runs every time the moles move
+    this.onMolesMoved = function(moles){};
+
+    // Keeping track of our user's current score
+    this.userScore = 0;
+
+    // The variable that holds our current timeout for the game loop
+    this.__gameLoop = null;
+};
+
+Game.prototype.increaseUserScore = function(){
+    this.__userScore++
+    this.onUserScoreChanged(this.userScore);
+};
+
+Game.prototype.start = function(){
+    this.gameInProgress = true;
+    var moveMoles = function(){
+        this.board.moveAllMolesRandomly();
+        this.onMolesMoved(this.board.moles);
+        this.__gameLoop = setTimeout(moveMoles, 1500);
+    }.bind(this);
+    moveMoles();
+};
+
+Game.prototype.stop = function(){
+    this.gameInProgress = false;
+    this.board.clearMoles();
+    this.onMolesMoved(this.board.moles);
+    clearTimeout(this.__gameLoop);
+};
+
+module.exports = Game;
+
+},{"./board":3}],5:[function(require,module,exports){
+"use strict";
+
+var Mole = function(name){
+    this.x = null;
+    this.y = null;
+};
+
+Mole.prototype.moveTo = function(x, y) {
+    this.x = x;
+    this.y = y;
+
+    return this;
+};
+
+Mole.prototype.currentPosition = function() {
+    return [this.x, this.y];
+};
+
+module.exports = Mole;
+
+},{}],6:[function(require,module,exports){
 /*!
  * jQuery JavaScript Library v2.2.2
  * http://jquery.com/
