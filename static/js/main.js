@@ -4,7 +4,7 @@
 var Game = require('./whackAMole/game');
 var GameRenderer = require('./gameRenderer');
 
-var thisGame = new Game([4, 4], 8);
+var thisGame = new Game([8,8], 8);
 new GameRenderer(thisGame, "#gameContainer");
 
 },{"./gameRenderer":2,"./whackAMole/game":4}],2:[function(require,module,exports){
@@ -110,8 +110,15 @@ GameRenderer.prototype.__initListeners = function(){
     var self = this;
 
     this.boardContainer.find('.board-cell').click(function(e){
+        // Don't let the user's clicks do anything if the game is
+        // currently paused or stopped
+        if( !self.game.gameInProgress )
+            return false;
+
+        // The coords for the cell that was clicked
         var thisX = $(this).data('xPos');
         var thisY = $(this).data('yPos');
+
         self.game.locationChosen(thisX, thisY, function(mole){
             self.game.pause();
             self.game.increaseUserScore();
@@ -266,11 +273,19 @@ var Game = function(boardSize, totalMoles){
 
     // The variable that holds our current timeout for the game loop
     this.__gameLoop = null;
+
+    // The delay for each loop
+    this.__gameLoopDelay = 1500;
 };
 
 Game.prototype.increaseUserScore = function(){
     this.userScore++
     this.onUserScoreChanged(this.userScore);
+    if( this.userScore == 0 )
+        this.__gameLoopDelay = 1500;
+        
+    if( this.userScore % 2 == 0 && this.__gameLoopDelay >= 500 )
+        this.__gameLoopDelay -= 300;
 };
 
 Game.prototype.locationChosen = function(x, y, onSuccess, onFailure){
@@ -287,7 +302,7 @@ Game.prototype.start = function(){
     var moveMoles = function(){
         this.board.moveAllMolesRandomly();
         this.onMolesMoved(this.board.moles);
-        this.__gameLoop = setTimeout(moveMoles, 750);
+        this.__gameLoop = setTimeout(moveMoles, this.__gameLoopDelay);
     }.bind(this);
     moveMoles();
 };
@@ -305,7 +320,7 @@ Game.prototype.stop = function(){
 
     this.onMolesMoved(this.board.moles);
     this.onUserScoreChanged(this.userScore);
-    
+
     clearTimeout(this.__gameLoop);
 };
 

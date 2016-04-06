@@ -100,8 +100,15 @@ GameRenderer.prototype.__initListeners = function(){
     var self = this;
 
     this.boardContainer.find('.board-cell').click(function(e){
+        // Don't let the user's clicks do anything if the game is
+        // currently paused or stopped
+        if( !self.game.gameInProgress )
+            return false;
+
+        // The coords for the cell that was clicked
         var thisX = $(this).data('xPos');
         var thisY = $(this).data('yPos');
+
         self.game.locationChosen(thisX, thisY, function(mole){
             self.game.pause();
             self.game.increaseUserScore();
