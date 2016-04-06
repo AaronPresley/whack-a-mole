@@ -109,6 +109,8 @@ a {
   right: 0;
   background: #6FA1B9;
   height: 0px;
+  overflow-x: hidden;
+  overflow-y: auto;
   text-align: center;
 }
 .prize-container h1 {
