@@ -48,7 +48,7 @@ Game.prototype.increaseUserScore = function(){
 
     // We want to slightly increase the game's speed to make things a
     // little more interesting
-    if( this.userScore % 2 == 0 && this.__gameLoopDelay >= 500 )
+    if( this.userScore % 2 == 0 && this.__gameLoopDelay > 300 )
         this.__gameLoopDelay -= 300;
 };
 

@@ -11,8 +11,8 @@ var Board = function(xLength, yLength, totalMoles){
     // Assigning these to a main property so it's easy to read their
     // x and y length without counting the grid arrays.
     // NOTE: Subtracting 1 because everything else is zero-based
-    this.gridX = xLength - 1;
-    this.gridY = yLength - 1;
+    this.gridX = xLength;
+    this.gridY = yLength;
 
     // The array of arrays that hold our grid
     this.grid = this.__generateGrid(xLength, yLength);
@@ -58,12 +58,12 @@ Board.prototype.__generateGrid = function(xLength, yLength){
 Board.prototype.__generateMoles = function(totalMoles) {
 
     // The total number of cells on this board
-    var totalBlocks = this.grid[0].length * this.grid[1].length
+    var totalBlocks = this.gridX * this.gridY;
 
     // Ensure that there aren't more moles than cells (minus 1)
     var maxMoles = totalBlocks - 1
     if( totalMoles > totalBlocks - 1 )
-        throw "With this grid, your max moles are " + maxMoles;
+        throw new Error("With this grid, your max moles are " + maxMoles);
 
     // An empty array to hole our moles
     var theMoles = [];
@@ -98,7 +98,7 @@ Board.prototype.__randomInRange = function(min, max){
 Board.prototype.moveMoleToLocation = function(mole, x, y) {
     // Ensure the target location fits within our board
     if( x > this.gridX || y > this.gridY )
-        throw "The desired location for this mole doesn't exist on the board."
+        throw new Error("The desired location for this mole doesn't exist on the board.");
 
     // Perform the move
     mole.moveTo(x, y);
