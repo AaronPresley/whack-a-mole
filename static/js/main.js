@@ -71,17 +71,6 @@ GameRenderer.prototype.cellAtLocation = function(x, y){
 };
 
 /**
- *	Updates a cellto either have or hide a mole
- *	@param {type} param - DESC
- */
-GameRenderer.prototype.setCellHasMole = function(cell, hasMole){
-    if( hasMole )
-        cell.addClass('has-mole');
-    else
-        cell.removeClass('has-mole');
-};
-
-/**
  *	Updates the frontend with the passed score
  *	@param {int} score - The score to show on the frontent
  */
@@ -102,11 +91,14 @@ GameRenderer.prototype.setMoles = function(moles){
     for( var x = 0; x < moles.length; x++ ){
         var thisMole = moles[x];
 
+        if( thisMole.x == null || thisMole.y == null )
+            continue;
+
         // Get the cell at this spot
         var thisCell = this.cellAtLocation(thisMole.x, thisMole.y);
 
         // Tell the HTML to indiciate this cell has a mole
-        this.setCellHasMole(thisCell, true);
+        thisCell.addClass('has-mole');
     }
 };
 
@@ -286,8 +278,8 @@ var Board = function(xLength, yLength, totalMoles){
     // Assigning these to a main property so it's easy to read their
     // x and y length without counting the grid arrays.
     // NOTE: Subtracting 1 because everything else is zero-based
-    this.gridX = xLength - 1;
-    this.gridY = yLength - 1;
+    this.gridX = xLength;
+    this.gridY = yLength;
 
     // The array of arrays that hold our grid
     this.grid = this.__generateGrid(xLength, yLength);
@@ -333,12 +325,12 @@ Board.prototype.__generateGrid = function(xLength, yLength){
 Board.prototype.__generateMoles = function(totalMoles) {
 
     // The total number of cells on this board
-    var totalBlocks = this.grid[0].length * this.grid[1].length
+    var totalBlocks = this.gridX * this.gridY;
 
     // Ensure that there aren't more moles than cells (minus 1)
     var maxMoles = totalBlocks - 1
     if( totalMoles > totalBlocks - 1 )
-        throw "With this grid, your max moles are " + maxMoles;
+        throw new Error("With this grid, your max moles are " + maxMoles);
 
     // An empty array to hole our moles
     var theMoles = [];
@@ -373,7 +365,7 @@ Board.prototype.__randomInRange = function(min, max){
 Board.prototype.moveMoleToLocation = function(mole, x, y) {
     // Ensure the target location fits within our board
     if( x > this.gridX || y > this.gridY )
-        throw "The desired location for this mole doesn't exist on the board."
+        throw new Error("The desired location for this mole doesn't exist on the board.");
 
     // Perform the move
     mole.moveTo(x, y);
@@ -420,7 +412,7 @@ Board.prototype.clearMoles = function(){
         this.moles[x].x = null;
         this.moles[x].y = null;
     }
-}
+};
 
 /**
  *	Returns the mole object at the given location, or returns
@@ -497,7 +489,7 @@ Game.prototype.increaseUserScore = function(){
 
     // We want to slightly increase the game's speed to make things a
     // little more interesting
-    if( this.userScore % 2 == 0 && this.__gameLoopDelay >= 500 )
+    if( this.userScore % 2 == 0 && this.__gameLoopDelay > 300 )
         this.__gameLoopDelay -= 300;
 };
 

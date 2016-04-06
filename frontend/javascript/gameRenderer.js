@@ -57,17 +57,6 @@ GameRenderer.prototype.cellAtLocation = function(x, y){
 };
 
 /**
- *	Updates a cellto either have or hide a mole
- *	@param {type} param - DESC
- */
-GameRenderer.prototype.setCellHasMole = function(cell, hasMole){
-    if( hasMole )
-        cell.addClass('has-mole');
-    else
-        cell.removeClass('has-mole');
-};
-
-/**
  *	Updates the frontend with the passed score
  *	@param {int} score - The score to show on the frontent
  */
@@ -88,11 +77,14 @@ GameRenderer.prototype.setMoles = function(moles){
     for( var x = 0; x < moles.length; x++ ){
         var thisMole = moles[x];
 
+        if( thisMole.x == null || thisMole.y == null )
+            continue;
+
         // Get the cell at this spot
         var thisCell = this.cellAtLocation(thisMole.x, thisMole.y);
 
         // Tell the HTML to indiciate this cell has a mole
-        this.setCellHasMole(thisCell, true);
+        thisCell.addClass('has-mole');
     }
 };
 

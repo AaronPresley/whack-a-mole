@@ -145,7 +145,7 @@ Board.prototype.clearMoles = function(){
         this.moles[x].x = null;
         this.moles[x].y = null;
     }
-}
+};
 
 /**
  *	Returns the mole object at the given location, or returns
