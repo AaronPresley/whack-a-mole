@@ -6,13 +6,16 @@ by [Aaron Presley](https://aaronpresley.com) in an effort to show off a little b
 Questions? I'm on Twitter [@AaronPresley](https://twitter.com/AaronPresley),
 or email me at [hello@aaronpresley.com](mailto:hello@aaronpresley.com).
 
+## Demo
+
+You can see the game on my site by going [here](http://whack-a-mole.aaronpresley.com/).
+
 ## Installation
 
 Clone the repo into your desired directory. I have included all compiled static
 files within the repo, so there shouldn't be any need to run a gulp command
 (unless you want to). Open up the `index.html` file to see the game.
 
-You can also see the game on my site by going [here](http://whack-a-mole.aaronpresley.com/).
 
 ### Building
 
@@ -40,7 +43,7 @@ prototype up and running.
 
 ### Game Renderer
 
-Currently the `GameRenderer` object I made is just generating dumb HTML and
+Currently the `GameRenderer` object is just generating dumb HTML and
 spitting it out on the page. I could have used a library like React or Mustache,
 but wanted to limit complexity and number of required libs.
 
