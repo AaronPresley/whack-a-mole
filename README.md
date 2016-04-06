@@ -3,6 +3,8 @@
 This is a simple Whack-A-Mole game using HTML, CSS, and Javascript. It was created
 by [Aaron Presley](https://aaronpresley.com) in an effort to show off a little bit.
 
+Questions? I'm on Twitter [@AaronPresley](https://twitter.com/AaronPresley),
+or email me at [hello@aaronpresley.com](mailto:hello@aaronpresley.com).
 
 ## Installation
 
@@ -12,7 +14,7 @@ files within the repo, so there shouldn't be any need to run a gulp command
 
 You can also see the game on my site by going [here](http://whack-a-mole.aaronpresley.com/).
 
-## Building
+### Building
 
 If you want to build the files yourself, run the `npm install` command within
 the project's directory. You might also need to run `gulp install -g` to install
@@ -21,14 +23,11 @@ gulp globally.
 After all the projects install, run `gulp build` to compile all the assets. You can
 then open up `index.html` in a browser to see the game.
 
-## Testing
+### Testing
 
 In order to test, you will have to install jasmine-node globally with
 `npm install jasmin-node -g`. After this you can run tests with `npm test`.
 
-## Browsers
-
-This game has been tested in Chrome and Safari only.
 
 ## Improvements
 
@@ -47,3 +46,13 @@ but wanted to limit complexity and number of required libs.
 
 Fortunately, no game logic relies on the `GameRenderer` object, and it could
 be fully replaced with relative ease.
+
+### Interface Testing
+
+While all JS objects relating to the game are tested, I am not currently testing
+the HTML or interactions on the testing layer.
+
+### Browsers
+
+This game was only tested on Chrome and Safari browsers. It likely works similarly
+on other browsers, but I haven't fully tested each one.
