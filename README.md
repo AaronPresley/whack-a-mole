@@ -69,7 +69,7 @@ me.
 
 ## Misc Notes
 
-- Each time the user scores, the moles move faster by .3 seconds.
+- The moles move faster by .3 seconds for every 2 points the user scores.
 - When a user hits a mole, the game pauses for about a second. This was mostly
 because I wanted to make sure the user sees the cute mole-hit image.
 - I created the hole image, as well as both mole states, in Adobe Illustrator. The
