@@ -4,112 +4,216 @@
 var Game = require('./whackAMole/game');
 var GameRenderer = require('./gameRenderer');
 
+// Instaniating a new game
 var thisGame = new Game([8,8], 8);
+
+// Passing our game object to our GameRenderer object to
+// get this party started
 new GameRenderer(thisGame, "#gameContainer");
 
 },{"./gameRenderer":2,"./whackAMole/game":4}],2:[function(require,module,exports){
 $ = require('jquery');
 
+/**
+ *	This class handles all of the game's output and management on the page.
+ *  NOTE: Yes, I am writing HTML within my JS. This might be dumb, but I
+ *      it's way simpler than adding another library. This class could
+ *      easily use React or Mustache or a similar library. I just went
+ *      with simple
+ *	@param {Game} theGame - The game instance we're wanting to output
+ *	@param {obj} gameContainer - The JS object of the element our game will be in
+ */
 var GameRenderer = function(theGame, gameContainer){
+    // Finding a few of our elements on the page
     this.boardContainer = $(gameContainer);
     this.startGameBtn = $('a.start-game');
     this.userScoreOutput = $('.user-score');
-    this.userScoreOutput.html(0);
 
+    // Our game instance
     this.game = theGame;
 
+    // Declaring what should happen when a mole gets moved
     this.game.onMolesMoved = function(moles){
         this.setMoles(moles);
     }.bind(this);
 
+    // Declaring what to do on a user score change
     this.game.onUserScoreChanged = function(score){
         this.updateUserScore(score);
     }.bind(this);
 
+    // Outputting our initial score
+    this.updateUserScore(this.game.userScore);
+
+    // Generating the HTML on the page
     this.__displayBoard();
+
+    // Start listening to clicks and events
     this.__initListeners();
 };
 
-GameRenderer.prototype.setCellHasMole = function(theCell, hasMole) {
-    if( hasMole )
-        theCell.addClass('has-mole');
-    else
-        theCell.removeClass('has-mole');
+/**
+ *	Returns the jquery cell object at the given coodinates
+ *	@param {int} x - The column of the desired cell
+ *	@param {int} y - The row of the desired cell
+ *  @returns {object|null}
+ */
+GameRenderer.prototype.cellAtLocation = function(x, y){
+    // Finding the cell
+    var theCell = this.boardContainer.find('.board-cell[data-x-pos="'+x+'"][data-y-pos="'+y+'"]');
+
+    // Only return the object if it was found
+    if( theCell.length )
+        return theCell
+
+    // Return nothing if it wasn't found
+    return null;
 };
 
+/**
+ *	Updates a cellto either have or hide a mole
+ *	@param {type} param - DESC
+ */
+GameRenderer.prototype.setCellHasMole = function(cell, hasMole){
+    if( hasMole )
+        cell.addClass('has-mole');
+    else
+        cell.removeClass('has-mole');
+};
+
+/**
+ *	Updates the frontend with the passed score
+ *	@param {int} score - The score to show on the frontent
+ */
 GameRenderer.prototype.updateUserScore = function(score){
     this.userScoreOutput.html(score);
 };
 
+/**
+ *	Accepts a list of moles and updates the page HTML to match
+ *  their coodinates
+ *	@param {Array} moles - The list of moles you want to show on the board
+ */
 GameRenderer.prototype.setMoles = function(moles){
-
     // Removing all current moles
     this.boardContainer.find('.board-cell.has-mole').removeClass('has-mole');
 
+    // Looping through each mole
     for( var x = 0; x < moles.length; x++ ){
         var thisMole = moles[x];
+
+        // Get the cell at this spot
         var thisCell = this.cellAtLocation(thisMole.x, thisMole.y);
-        thisCell.addClass('has-mole');
+
+        // Tell the HTML to indiciate this cell has a mole
+        this.setCellHasMole(thisCell, true);
     }
 };
 
+/**
+ *	Generates all of the board's HTML and outputs it on the page
+ */
 GameRenderer.prototype.__displayBoard = function(){
+    // Get the desired board size
     var xLen = this.game.board.gridX;
     var yLen = this.game.board.gridY;
+
+    // Generate the HTML
     var boardHtml = this.__generateBoardHtml(xLen, yLen);
+
+    // Outputting it on the page
     this.boardContainer.html(boardHtml);
 };
 
+/**
+ *	Generates the HTML for the board and board container
+ *	@param {int} xLen - The columns of the board
+ *	@param {int} yLen - The rows of the board
+ *  @returns {string}
+ */
 GameRenderer.prototype.__generateBoardHtml = function(xLen, yLen){
     var boardHtml = '<div class="board">';
 
+    // Looping through each row
     for( var y = 0; y < yLen; y++ ){
+        // Empty var to hold any speciall classes
         var classString = '';
+
+        // Is this the first row?
         if( y == 0 )
             classString = 'first';
+
+        // Is this the last row?
         else if( y == yLen-1)
             classString = 'last';
 
+        // Generate this row's HTML and append it to the board HTML
         boardHtml += this.__generateRowHtml(y, xLen, classString);
     }
 
     boardHtml += '</div>';
+
+    // Returning the HTML
     return boardHtml;
 };
 
+/**
+ *	Generates a single row's HTML with the given cells
+ *	@param {int} rowNum - Which number of row this is so it can be output in a data attribute
+ *	@param {int} totalCells - How many cells should be in this row
+ *	@param {string} classString - Any additional classes that should be given to this row
+ *  @returns {string}
+ */
 GameRenderer.prototype.__generateRowHtml = function(rowNum, totalCells, classString){
+    // If no class string was passed, we just want it to be empty
     classString = classString == undefined ? '' : classString;
 
     var rowOutput = '<div class="board-row ' + classString + '">';
+
+    // Generate all of the cells for this row and append to string bar
     rowOutput += this.__generateCellHtml(rowNum, totalCells);
+
     rowOutput += '</div>';
     return rowOutput;
 };
 
+/**
+ *	Generates the HTML for x many cells
+ *	@param {int} rowNum - The row number this cell is being added to
+ */
 GameRenderer.prototype.__generateCellHtml = function(rowNum, totalCells) {
     var cellHtml = "";
+
+    // Looping to create as many cells as we were told
     for( var x = 0; x < totalCells; x++ ){
+        // An empty var to hold any special classes
         var thisCellClassString = '';
 
+        // Is this the first cell?
         if( x == 0 )
             thisCellClassString += 'first ';
 
-        if( x == totalCells-1 )
+        // Is this the last cell?
+        else if( x == totalCells - 1 )
             thisCellClassString += 'last ';
 
+        // Generate the HTML and append to overall HTML var
         cellHtml += '<div class="board-cell '+ thisCellClassString +'" data-x-pos="' + x + '" data-y-pos="' + rowNum + '" ></div>';
     }
+
+    // Return the goods
     return cellHtml;
 };
 
-GameRenderer.prototype.cellAtLocation = function(x, y){
-    return this.boardContainer.find('.board-cell[data-x-pos="'+x+'"][data-y-pos="'+y+'"]');
-};
-
+// Initializes all the events and clicks the user could make
 GameRenderer.prototype.__initListeners = function(){
+    // Doing this because I'll need access to $(this) within
+    // some of the event methods
     var self = this;
 
+    // Gets fired every time a user clicks on a single cell
     this.boardContainer.find('.board-cell').click(function(e){
+
         // Don't let the user's clicks do anything if the game is
         // currently paused or stopped
         if( !self.game.gameInProgress )
@@ -119,28 +223,49 @@ GameRenderer.prototype.__initListeners = function(){
         var thisX = $(this).data('xPos');
         var thisY = $(this).data('yPos');
 
+        // Tell our game object we've chosen a spot
         self.game.locationChosen(thisX, thisY, function(mole){
+            // Pause our game so the user has enough time to see they
+            // hite a mole
             self.game.pause();
+
+            // Reward the user for their hard work
             self.game.increaseUserScore();
+
+            // Add a class to the cell so our "hit" animation gets shown
             $(this).removeClass('has-mole').addClass('mole-hit');
+
+            // Pause the game for 1 second then start again (so the user can
+            // see they hit a mole)
             setTimeout(function(){
                 $(this).removeClass('mole-hit');
                 self.game.start();
-
             }.bind(this), 1000);
+
         }.bind(this), function(){
+            // We're not currently punishing the user for clicking
+            // an empty cell, but we could do that here if we wanted
             console.log('BOO!');
         }.bind(this));
     });
 
+    // Gets fired when tue user clicks the Start Game button
     this.startGameBtn.click(function(e){
         e.preventDefault();
+
+        // We don't have a game in progress so get one started
         if( !self.game.gameInProgress ) {
-            $(this).html('Stop Game');
             self.game.start();
+
+            // Update the text accordingly
+            $(this).html('Stop Game');
+
+        // We have a game going, so stop it
         } else {
-            $(this).html('Start Game');
             self.game.stop();
+
+            // Updating the text accordingly
+            $(this).html('Start Game');
         }
     });
 };
@@ -152,46 +277,73 @@ module.exports = GameRenderer;
 
 var Mole = require('./mole');
 
+/**
+ *	This ckass represents a single board within a game.
+ *	@param {int} xLength - How many columns the board's grid should have
+ *	@param {int} yLength - How many rows the board's grid should have
+ */
 var Board = function(xLength, yLength, totalMoles){
     // Assigning these to a main property so it's easy to read their
-    // x and y length without counting the grid arrays
-    this.gridX = xLength;
-    this.gridY = yLength;
+    // x and y length without counting the grid arrays.
+    // NOTE: Subtracting 1 because everything else is zero-based
+    this.gridX = xLength - 1;
+    this.gridY = yLength - 1;
 
     // The array of arrays that hold our grid
     this.grid = this.__generateGrid(xLength, yLength);
 
     // The array that hold our moles
     this.moles = this.__generateMoles(totalMoles);
+
+    // Scrample the moles!
     this.moveAllMolesRandomly();
 };
 
-Board.prototype.__randomInRange = function(min, max){
-    return Math.floor(Math.random() * (max - min + 1)) + min;
-};
-
+/**
+ *	This generates the grid arrays based on the passed params
+ *	@param {int} xLength - How many columns to give this grid
+ *	@param {int} yLength - How many rows to give this grid
+ *  @returns {Array}
+ */
 Board.prototype.__generateGrid = function(xLength, yLength){
+    // Starting empty
     var thisGrid = [];
 
+    // Loop through the total numbered of desired rows
     for( var y = 0; y < yLength; y++ ){
+        // Creating our empty row
         var thisRow = [];
-        for( var x = 0; x < xLength; x++ ){
+
+        // Pushing to this row for as many cols as we want
+        for( var x = 0; x < xLength; x++ )
             thisRow.push(x);
-        }
+
+        // Pushing this row to the overall grid
         thisGrid.push(thisRow);
     }
 
     return thisGrid;
 };
 
+/**
+ *	Generates x many moles and adds them to this board
+ *	@param {int} totalMoles - How many moles we want to generate
+ *  @returns {Array}
+ */
 Board.prototype.__generateMoles = function(totalMoles) {
-    // First we need to make sure there aren't more moles than
-    // blocks in the grid minus 1
-    var totalBlocks = this.grid[0].length * this.grid[1].length
-    if( totalMoles > totalBlocks - 1 )
-        throw "With this grid, your max moles are " + totalMoles;
 
+    // The total number of cells on this board
+    var totalBlocks = this.grid[0].length * this.grid[1].length
+
+    // Ensure that there aren't more moles than cells (minus 1)
+    var maxMoles = totalBlocks - 1
+    if( totalMoles > totalBlocks - 1 )
+        throw "With this grid, your max moles are " + maxMoles;
+
+    // An empty array to hole our moles
     var theMoles = [];
+
+    // Creating the empty moles and pushing to the array
     for(var x = 0; x < totalMoles; x++ ){
         var thisMole = new Mole();
         theMoles.push(thisMole);
@@ -200,51 +352,95 @@ Board.prototype.__generateMoles = function(totalMoles) {
     return theMoles;
 };
 
-Board.prototype.moveMoleToLocation = function(mole, x, y) {
-    mole.moveTo(x, y);
-    return this;
+/**
+ *	A helper method to generate a random number within a range. This
+ *  COULD have been made a private method, but I didn't want a new instance
+ *  to be created in memory every time it ran
+ *	@param {int} min - The lowest (inclusive) possible number to return
+ *	@param {int} max - The highest (inclusive) possible number to return
+ *  @returns {int}
+ */
+Board.prototype.__randomInRange = function(min, max){
+    return Math.floor(Math.random() * (max - min + 1)) + min;
 };
 
-Board.prototype.moveMoleRandomly = function(mole){
-    var xMax = this.grid[0].length-1;
-    var yMax = this.grid.length-1;
+/**
+ *	Moves a single mole object to a specific location within the board
+ *	@param {Mole} mole - The mole object we want to move
+ *	@param {int} x - The column we want to move to
+ *	@param {int} y - The row we want to move to
+ */
+Board.prototype.moveMoleToLocation = function(mole, x, y) {
+    // Ensure the target location fits within our board
+    if( x > this.gridX || y > this.gridY )
+        throw "The desired location for this mole doesn't exist on the board."
 
+    // Perform the move
+    mole.moveTo(x, y);
+};
+
+/**
+ *	Moves a single mole object around randomly on the board
+ *	@param {Mole} mole - The mole we're wanting to move around
+ */
+Board.prototype.moveMoleRandomly = function(mole){
+    var xMax = this.gridX-1;
+    var yMax = this.gridY-1;
+
+    // Get random numbers within our board ranges
     var xRandom = this.__randomInRange(0, xMax);
     var yRandom = this.__randomInRange(0, yMax);
 
+    // Ensure that we never place two moles on the same cell
     while( this.moleAtLocation(xRandom, yRandom) != null ){
         var xRandom = this.__randomInRange(0, xMax);
         var yRandom = this.__randomInRange(0, yMax);
     }
 
-    mole.moveTo(xRandom, yRandom);
-
-    return this;
+    // Perform the move
+    this.moveMoleToLocation(mole, xRandom, yRandom);
 };
 
+/**
+ *	Loops through all moles on this board and moves them to
+ *  a random location.
+ */
 Board.prototype.moveAllMolesRandomly = function(){
-    for( var x in this.moles ){
+    for( var x in this.moles )
         this.moveMoleRandomly(this.moles[x]);
-    }
-
-    return this;
 };
 
+/**
+ *	Sets all mole's locations to null
+ */
 Board.prototype.clearMoles = function(){
+    // Looping through each mole
     for( var x = 0; x < this.moles.length; x++ ){
+        // Setting their coords to null
         this.moles[x].x = null;
         this.moles[x].y = null;
     }
 }
 
+/**
+ *	Returns the mole object at the given location, or returns
+ *  null if there isn't one there
+ *	@param {int} xPos - The column to test for a mole presence
+ *	@param {int} yPos - The row to test for a mole presence
+ *  @returns {Mole|null}
+ */
 Board.prototype.moleAtLocation = function(xPos, yPos){
-
+    // Looping through each mole to determine if there's
+    // one living there
     for( var x = 0; x < this.moles.length; x++ ){
         var thisMole = this.moles[x];
+
+        // Does this mole match the passed location?
         if( thisMole.x == xPos && thisMole.y == yPos )
             return thisMole;
     }
 
+    // No mole was found so return null;
     return null;
 };
 
@@ -255,17 +451,24 @@ module.exports = Board;
 
 var Board = require('./board');
 
+/**
+ *	A class that manages the current Whack-a-Mole game
+ *	@param {array} boardSize - An array that contains the x & y size of this games board
+ *  @param {int} totalMoles - How many moles should be on this board
+ */
 var Game = function(boardSize, totalMoles){
-    // Holds the the current status of our game board
+    // Holes our board instance
     this.board = new Board(boardSize[0], boardSize[1], totalMoles);
 
-    // A variable to check whether or not there's a going going
+    // A variable to check whether or not there's a game going
     this.gameInProgress = false;
 
     // A function that gets run every time a user's score changes
+    // Defaulting to nothing
     this.onUserScoreChanged = function(score){};
 
-    // A function that runs every time the moles move
+    // A function that runs every time the moles get moved
+    // Defaulting to nothing
     this.onMolesMoved = function(moles){};
 
     // Keeping track of our user's current score
@@ -278,50 +481,98 @@ var Game = function(boardSize, totalMoles){
     this.__gameLoopDelay = 1500;
 };
 
+/**
+ *	A simple method that gets run when the user hits a mole
+ */
 Game.prototype.increaseUserScore = function(){
+    // Increment our score
     this.userScore++
+
+    // Running our user-defined method that the score has been changed
     this.onUserScoreChanged(this.userScore);
+
+    // Resetting the game speed if the game has been stopped and reset
     if( this.userScore == 0 )
         this.__gameLoopDelay = 1500;
-        
+
+    // We want to slightly increase the game's speed to make things a
+    // little more interesting
     if( this.userScore % 2 == 0 && this.__gameLoopDelay >= 500 )
         this.__gameLoopDelay -= 300;
 };
 
-Game.prototype.locationChosen = function(x, y, onSuccess, onFailure){
+/**
+ *	Is run when the user has indicated a specific cell on the board
+ *	@param {int} x - The column the user clicked
+ *	@param {int} y - The row the user clicked
+ *	@param {func} onCellFilled - The method to run if there was a mole present
+ *	@param {func} onCellEmpty - The method to run if there was nothing in the cell
+ */
+Game.prototype.locationChosen = function(x, y, onCellFilled, onCellEmpty){
+    // Getting the mole with the given coords
     var theMole = this.board.moleAtLocation(x, y);
-    if( theMole ){
-        onSuccess(theMole);
-    } else {
-        onFailure();
-    }
+
+    // Running the correct functions based on if a mole was found
+    if( theMole )
+        onCellFilled(theMole);
+    else
+        onCellEmpty();
 };
 
+/**
+ *	Starts a game loop which progresses the game
+ */
 Game.prototype.start = function(){
+    // Setting our game as in-progress
     this.gameInProgress = true;
+
+    // A closer which performs the next step of the game
     var moveMoles = function(){
+        // Move all the moles around randomly
         this.board.moveAllMolesRandomly();
+
+        // Allow the user's method to run after the change
         this.onMolesMoved(this.board.moles);
+
+        // Delaying a bit and then starting it all over. I'm choosing
+        // setTimeout instead of setInterval because I know there won't
+        // be cycles stacking on top of each other. Also because
+        // the delay changes along with the user's score
         this.__gameLoop = setTimeout(moveMoles, this.__gameLoopDelay);
+
     }.bind(this);
+
+    // Starting the loop
     moveMoles();
 };
 
+/**
+ *	Pauses the came and leaves the moles where they are
+ */
 Game.prototype.pause = function(){
+    // Updating our var
     this.gameInProgress = false;
+
+    // Stopping and clearing our loop
     clearTimeout(this.__gameLoop);
     this.__gameLoop = null;
 };
 
+/**
+ *	Stops the game, removes the moles and resets the user's scoare
+ */
 Game.prototype.stop = function(){
     this.gameInProgress = false;
     this.userScore = 0;
     this.board.clearMoles();
 
+    // Running the user-defined functions
     this.onMolesMoved(this.board.moles);
     this.onUserScoreChanged(this.userScore);
 
+    // Stopping and clearing the loop var
     clearTimeout(this.__gameLoop);
+    this.__gameLoop = null;
 };
 
 module.exports = Game;
@@ -329,18 +580,30 @@ module.exports = Game;
 },{"./board":3}],5:[function(require,module,exports){
 "use strict";
 
-var Mole = function(name){
+/**
+ *	A class representing a single mole within a board
+ */
+var Mole = function(){
+    // Our mole doesn't have a position on creation
     this.x = null;
     this.y = null;
 };
 
+/**
+ *	Sets the mole's position to a single point on the board
+ *	@param {int} x - The x coordinate for the new position
+ *	@param {int} y - The y coordinate for the new position
+ */
 Mole.prototype.moveTo = function(x, y) {
     this.x = x;
     this.y = y;
-
-    return this;
 };
 
+/**
+ *	Returns this mole's current position on the board
+ *  in an array
+ *  @returns {Array}
+ */
 Mole.prototype.currentPosition = function() {
     return [this.x, this.y];
 };
