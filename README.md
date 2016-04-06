@@ -34,7 +34,7 @@ In order to test, you will have to install jasmine-node globally with
 
 ## Improvements
 
-There are several aspects that could be improved about this game.
+There are a few aspects that I'd like to improve upon given some more time:
 
 ### Mobile Friendly
 
@@ -53,7 +53,7 @@ be fully replaced with relative ease.
 ### Interface Testing
 
 While all JS objects relating to the game are tested, I am not currently testing
-the HTML or interactions on the testing layer.
+the HTML or interactions on the presentation layer.
 
 ### Browsers
 
@@ -70,6 +70,8 @@ me.
 ## Misc Notes
 
 - Each time the user scores, the moles move faster by .3 seconds.
+- When a user hits a mole, the game pauses for about a second. This was mostly
+because I wanted to make sure the user sees the cute mole-hit image.
 - I created the hole image, as well as both mole states, in Adobe Illustrator. The
 original file is located at `static/img/cell-art.ai`.
 - Currently jQuery is the only library being used (except for node compilation, which
@@ -78,3 +80,5 @@ is using `gulp` and `browserify`).
 it easy to implement React or a similar library with relative ease.
 - I didn't come across a huge need for using closures, except in the `Game.start()`
 method, which handles the game's speed given the current user score.
+- I'm leaving all of the assets un-compressed to make it easier to poke through
+the JS and CSS.
