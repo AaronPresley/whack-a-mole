@@ -1,26 +1,94 @@
+@import url(https://fonts.googleapis.com/css?family=Open+Sans:700,600,400,300);
+
 html, body {
-    font-family:"Helvetica", sans-serif;
+    font-family: 'Open Sans', sans-serif;
+    background:#EFEFEF;
     color: #333;
 }
 
-header {
-    margin:10px 0 30px;
-    text-align: center;
+a {
+    color:#4a90e2;
+    text-decoration: none;
+}
 
-    h1 {
-        font-size:35px;
-        margin:0;
+.wrapper {
+    max-width:600px;
+    margin:0 auto;
+
+    header {
+        margin:10px 0 30px;
+        text-align: center;
+
+        h1 {
+            font-size:54px;
+            font-weight: 700;
+            margin:0;
+        }
+
+        h2 {
+            font-size:20px;
+            font-weight: 300;
+            margin:0;
+        }
     }
-    h2 {
-        font-size:20px;
-        font-weight: normal;
-        margin:0;
+
+    .game-wrapper {
+        position: relative;
+        .start-container {
+            position: absolute;
+            top:0;
+            right:0;
+            bottom:0;
+            left:0;
+            background:rgba(239, 239, 239, 0.8);
+            text-align: center;
+            font-weight: 700;
+            padding-top:150px;
+            font-size:40px;
+        }
+    }
+
+    .score-container {
+        text-align: center;
+        font-size:54px;
+        font-weight: 700;
+        margin-top:20px;
+
+        span {
+            display:inline-block;
+            background:#333;
+            color:white;
+            padding:10px 15px 13px;
+            line-height:50px;
+        }
     }
 }
 
-.game-options {
-    margin:15px 0 0;
+.mobile-disclaimer {
+    position: fixed;
+    top:0;
+    right:0;
+    bottom:0;
+    left:0;
+    background:#4a90e2;
+    padding:30px;
+    font-size:25px;
+    font-weight: 600;
     text-align: center;
+
+    @media(min-width:450px) {
+        display:none;
+    }
 }
+
+.prize-container {
+    position: fixed;
+    bottom:0;
+    left:0;
+    right:0;
+    background:green;
+    height:0px;
+}
+
 
 @import "./board";

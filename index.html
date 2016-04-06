@@ -5,15 +5,30 @@
         <link rel="stylesheet" href="static/css/main.css">
     </head>
     <body>
-        <header>
-            <h1>Whack-A-Mole</h1>
-            <h2>A (really) simple game created by <a href="mailto:hello@aaronpresley.com">Aaron Presley</a></h2>
-        </header>
+        <div class="wrapper">
+            <header>
+                <h1>Whack-A-Mole</h1>
+                <h2>Get to <strong>10</strong> for an <em>life changing</em> prize.</h2>
+            </header>
 
-        <div id="gameContainer"></div>
-        <div class="game-options">
-            <span><strong>Your Score:</strong><span class="user-score"></span></span>
-            <a href="#" class="start-game">Start Game</a>
+            <div class="game-wrapper">
+                <div class="start-container">
+                    <a href="#" class="start-game">Start Game</a>
+                </div>
+                <div id="gameContainer"></div>
+            </div>
+
+            <div class="score-container">
+                Score: <span class="user-score">1</span>
+            </div>
+        </div>
+
+        <div class="mobile-disclaimer">
+            Sorry, this project doesn't look great at this size. Try on a Desktop!
+        </div>
+
+        <div class="prize-container">
+            Some prize here
         </div>
 
         <script type="text/javascript" src="static/js/main.js"></script>

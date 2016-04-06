@@ -1,24 +1,84 @@
+@import url(https://fonts.googleapis.com/css?family=Open+Sans:700,600,400,300);
 html,
 body {
-  font-family: "Helvetica", sans-serif;
+  font-family: 'Open Sans', sans-serif;
+  background: #EFEFEF;
   color: #333;
 }
-header {
+a {
+  color: #4a90e2;
+  text-decoration: none;
+}
+.wrapper {
+  max-width: 600px;
+  margin: 0 auto;
+}
+.wrapper header {
   margin: 10px 0 30px;
   text-align: center;
 }
-header h1 {
-  font-size: 35px;
+.wrapper header h1 {
+  font-size: 54px;
+  font-weight: 700;
   margin: 0;
 }
-header h2 {
+.wrapper header h2 {
   font-size: 20px;
-  font-weight: normal;
+  font-weight: 300;
   margin: 0;
 }
-.game-options {
-  margin: 15px 0 0;
+.wrapper .game-wrapper {
+  position: relative;
+}
+.wrapper .game-wrapper .start-container {
+  position: absolute;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  background: rgba(239, 239, 239, 0.8);
   text-align: center;
+  font-weight: 700;
+  padding-top: 150px;
+  font-size: 40px;
+}
+.wrapper .score-container {
+  text-align: center;
+  font-size: 54px;
+  font-weight: 700;
+  margin-top: 20px;
+}
+.wrapper .score-container span {
+  display: inline-block;
+  background: #333;
+  color: white;
+  padding: 10px 15px 13px;
+  line-height: 50px;
+}
+.mobile-disclaimer {
+  position: fixed;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  background: #4a90e2;
+  padding: 30px;
+  font-size: 25px;
+  font-weight: 600;
+  text-align: center;
+}
+@media (min-width: 450px) {
+  .mobile-disclaimer {
+    display: none;
+  }
+}
+.prize-container {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  background: green;
+  height: 0px;
 }
 .board .board-row {
   text-align: center;

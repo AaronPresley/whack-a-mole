@@ -28,6 +28,10 @@ var GameRenderer = function(theGame, gameContainer){
     this.boardContainer = $(gameContainer);
     this.startGameBtn = $('a.start-game');
     this.userScoreOutput = $('.user-score');
+    this.prizeContainer = $('.prize-container');
+
+    // How many points the user has to get before showing the prize
+    this.winningScore = 10;
 
     // Our game instance
     this.game = theGame;
@@ -227,12 +231,26 @@ GameRenderer.prototype.__initListeners = function(){
             // Add a class to the cell so our "hit" animation gets shown
             $(this).removeClass('has-mole').addClass('mole-hit');
 
-            // Pause the game for 1 second then start again (so the user can
-            // see they hit a mole)
-            setTimeout(function(){
-                $(this).removeClass('mole-hit');
-                self.game.start();
-            }.bind(this), 1000);
+            // The user has won the game!
+            if( self.game.userScore == self.winningScore ){
+                // Give a slight delay so they know what's happening
+                setTimeout(function(){
+                    // Slide up the prize container
+                    self.prizeContainer.animate({
+                        height: "100%"
+                    }, 750);
+
+                }, 750);
+
+            // The user still has more points to go
+            } else {
+                // Pause the game for 1 second then start again (so the user can
+                // see they hit a mole)
+                setTimeout(function(){
+                    $(this).removeClass('mole-hit');
+                    self.game.start();
+                }.bind(this), 1000);
+            }
 
         }.bind(this), function(){
             // We're not currently punishing the user for clicking
@@ -244,21 +262,8 @@ GameRenderer.prototype.__initListeners = function(){
     // Gets fired when tue user clicks the Start Game button
     this.startGameBtn.click(function(e){
         e.preventDefault();
-
-        // We don't have a game in progress so get one started
-        if( !self.game.gameInProgress ) {
-            self.game.start();
-
-            // Update the text accordingly
-            $(this).html('Stop Game');
-
-        // We have a game going, so stop it
-        } else {
-            self.game.stop();
-
-            // Updating the text accordingly
-            $(this).html('Start Game');
-        }
+        self.game.start();
+        $(this).closest('.start-container').remove();
     });
 };
 
