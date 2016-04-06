@@ -10,6 +10,19 @@ or email me at [hello@aaronpresley.com](mailto:hello@aaronpresley.com).
 
 You can see the game on my site by going [here](http://whack-a-mole.aaronpresley.com/).
 
+
+## Misc Notes
+
+- Each time the user scores, the moles move faster by .3 seconds.
+- I created the hole image, as well as both mole states, in Adobe Illustrator. The
+original file is located at `static/img/cell-art.ai`.
+- Currently jQuery is the only library being used.
+- All game objects are completely separate from the presentation layer, making
+it easy to implement React or a similar library with relative ease.
+- I didn't come across a huge need for using closures, except in the `Game.start()`
+method, which handles the game's speed given the current user score.
+
+
 ## Installation
 
 Clone the repo into your desired directory. I have included all compiled static
@@ -59,3 +72,9 @@ the HTML or interactions on the testing layer.
 
 This game was only tested on Chrome and Safari browsers. It likely works similarly
 on other browsers, but I haven't fully tested each one.
+
+### Raw Javascript
+
+I'm using jQuery, but its use is so minimal I probably could easily switch to
+only using raw JS. I decided to opt for jQuery since it'd be a bit faster for
+me.
