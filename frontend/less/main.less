@@ -1,4 +1,5 @@
 @import url(https://fonts.googleapis.com/css?family=Open+Sans:700,600,400,300);
+@import "./board";
 
 html, body {
     font-family: 'Open Sans', sans-serif;
@@ -91,4 +92,10 @@ a {
 }
 
 
-@import "./board";
+// A little bit of a hack to pre-load the images. This prevents
+// a white square on the first few loops of the game.
+.preload-container {
+    position: absolute;
+    top:-99999px;
+    left:-99999px;
+}

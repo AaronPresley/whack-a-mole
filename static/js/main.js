@@ -228,8 +228,11 @@ GameRenderer.prototype.__initListeners = function(){
             // Reward the user for their hard work
             self.game.increaseUserScore();
 
-            // Add a class to the cell so our "hit" animation gets shown
-            $(this).removeClass('has-mole').addClass('mole-hit');
+            // Remove all moles to show the one that was hit
+            self.boardContainer.find('.has-mole').removeClass('has-mole');
+
+            // Show this cell as being hit
+            $(this).addClass('mole-hit');
 
             // The user has won the game!
             if( self.game.userScore == self.winningScore ){
