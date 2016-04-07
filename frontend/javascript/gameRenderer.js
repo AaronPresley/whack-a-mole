@@ -2,7 +2,7 @@ $ = require('jquery');
 
 /**
  *	This class handles all of the game's output and management on the page.
- *  NOTE: Yes, I am writing HTML within my JS. This might be dumb, but I
+ *  NOTE: I am writing HTML within my JS. This might be dumb, but I think
  *      it's way simpler than adding another library. This class could
  *      easily use React or Mustache or a similar library. I just went
  *      with simple
