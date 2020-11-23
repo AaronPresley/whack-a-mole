@@ -1,84 +1,46 @@
-# Whack-A-Mole
+# Getting Started with Create React App
 
-This is a simple Whack-A-Mole game using HTML, CSS, and Javascript. It was created
-by [Aaron Presley](https://aaronpresley.com) in an effort to show off a little bit.
+This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
 
-Questions? I'm on Twitter [@AaronPresley](https://twitter.com/AaronPresley),
-or email me at [hello@aaronpresley.com](mailto:hello@aaronpresley.com).
+## Available Scripts
 
-## Demo
+In the project directory, you can run:
 
-You can see the game on my site by going [here](http://whack-a-mole.aaronpresley.com/).
+### `yarn start`
 
-## Installation
+Runs the app in the development mode.\
+Open [http://localhost:3000](http://localhost:3000) to view it in the browser.
 
-Clone the repo into your desired directory. I have included all compiled static
-files within the repo, so there shouldn't be any need to run a gulp command
-(unless you want to). Open up the `index.html` file to see the game.
+The page will reload if you make edits.\
+You will also see any lint errors in the console.
 
+### `yarn test`
 
-### Building
+Launches the test runner in the interactive watch mode.\
+See the section about [running tests](https://facebook.github.io/create-react-app/docs/running-tests) for more information.
 
-If you want to build the files yourself, run the `npm install` command within
-the project's directory. You might also need to run `gulp install -g` to install
-gulp globally.
+### `yarn build`
 
-After all the projects install, run `gulp build` to compile all the assets. You can
-then open up `index.html` in a browser to see the game.
+Builds the app for production to the `build` folder.\
+It correctly bundles React in production mode and optimizes the build for the best performance.
 
-### Testing
+The build is minified and the filenames include the hashes.\
+Your app is ready to be deployed!
 
-In order to test, you will have to install jasmine-node globally with
-`npm install jasmin-node -g`. After this you can run tests with `npm test`.
+See the section about [deployment](https://facebook.github.io/create-react-app/docs/deployment) for more information.
 
+### `yarn eject`
 
-## Improvements
+**Note: this is a one-way operation. Once you `eject`, you can’t go back!**
 
-There are a few aspects that I'd like to improve upon given some more time:
+If you aren’t satisfied with the build tool and configuration choices, you can `eject` at any time. This command will remove the single build dependency from your project.
 
-### Mobile Friendly
+Instead, it will copy all the configuration files and the transitive dependencies (webpack, Babel, ESLint, etc) right into your project so you have full control over them. All of the commands except `eject` will still work, but they will point to the copied scripts so you can tweak them. At this point you’re on your own.
 
-Currently this game is not mobile friendly, as my goal was to get a working
-prototype up and running.
+You don’t have to ever use `eject`. The curated feature set is suitable for small and middle deployments, and you shouldn’t feel obligated to use this feature. However we understand that this tool wouldn’t be useful if you couldn’t customize it when you are ready for it.
 
-### Game Renderer
+## Learn More
 
-Currently the `GameRenderer` object is just generating dumb HTML and
-spitting it out on the page. I could have used a library like React or Mustache,
-but wanted to limit complexity and number of required libs.
+You can learn more in the [Create React App documentation](https://facebook.github.io/create-react-app/docs/getting-started).
 
-Fortunately, no game logic relies on the `GameRenderer` object, and it could
-be fully replaced with relative ease.
-
-### Interface Testing
-
-While all JS objects relating to the game are tested, I am not currently testing
-the HTML or interactions on the presentation layer.
-
-### Browsers
-
-This game was only tested on Chrome and Safari browsers. It likely works similarly
-on other browsers, but I haven't fully tested each one.
-
-### Raw Javascript
-
-I'm using jQuery, but its use is so minimal I probably could easily switch to
-only using raw JS. I decided to opt for jQuery since it'd be a bit faster for
-me.
-
-
-## Misc Notes
-
-- The moles move faster by .3 seconds for every 2 points the user scores.
-- When a user hits a mole, the game pauses for about a second. This was mostly
-because I wanted to make sure the user sees the cute mole-hit image.
-- I created the hole image, as well as both mole states, in Adobe Illustrator. The
-original file is located at `static/img/cell-art.ai`.
-- Currently jQuery is the only library being used (except for node compilation, which
-is using `gulp` and `browserify`).
-- All game objects are completely separate from the presentation layer, making
-it easy to implement React or a similar library with relative ease.
-- I didn't come across a huge need for using closures, except in the `Game.start()`
-method, which handles the game's speed given the current user score.
-- I'm leaving all of the assets un-compressed to make it easier to poke through
-the JS and CSS.
+To learn React, check out the [React documentation](https://reactjs.org/).
